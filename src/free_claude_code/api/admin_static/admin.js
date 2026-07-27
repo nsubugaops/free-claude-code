@@ -716,6 +716,37 @@ function showMessage(message, kind = "") {
   area.className = `message-area ${kind}`.trim();
 }
 
+function initThemeToggle() {
+  const toggle = byId("themeToggle");
+  const icon = byId("themeToggleIcon");
+  const label = byId("themeToggleLabel");
+
+  const applyTheme = (theme) => {
+    const isDark = theme === "dark";
+    if (isDark) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+    toggle.setAttribute("aria-pressed", String(isDark));
+    icon.textContent = isDark ? "☀️" : "🌙";
+    label.textContent = isDark ? "Light mode" : "Dark mode";
+  };
+
+  applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light");
+
+  toggle.addEventListener("click", () => {
+    const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    applyTheme(next);
+    try {
+      localStorage.setItem("fcc-admin-theme", next);
+    } catch (error) {
+      /* localStorage unavailable; theme choice won't persist */
+    }
+  });
+}
+
+initThemeToggle();
 byId("validateButton").addEventListener("click", () => validate(true));
 byId("applyButton").addEventListener("click", apply);
 document.addEventListener("pointerdown", (event) => {
