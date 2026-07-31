@@ -257,6 +257,47 @@ def test_admin_static_model_combobox_preserves_custom_slugs_and_none_semantics()
     assert '"warn"' in script
 
 
+def test_admin_static_defaults_to_light_theme_with_dark_opt_in():
+    styles = Path("src/free_claude_code/api/admin_static/admin.css").read_text(
+        encoding="utf-8"
+    )
+
+    assert "color-scheme: light;" in styles
+    assert ':root[data-theme="dark"]' in styles
+    assert styles.index("color-scheme: light;") < styles.index(
+        ':root[data-theme="dark"]'
+    )
+    dark_block = styles[styles.index(':root[data-theme="dark"]') :]
+    assert "--bg-translucent: rgba(9, 10, 15, 0.82);" in dark_block
+    assert "--bg-translucent-strong: rgba(9, 10, 15, 0.95);" in dark_block
+    assert "background: var(--bg-translucent);" in styles
+    assert "background: var(--bg-translucent-strong);" in styles
+    assert "background: var(--disabled-bg);" in styles
+    assert "box-shadow: var(--shadow-bar);" in styles
+    assert ".theme-toggle" in styles
+
+
+def test_admin_static_theme_toggle_persists_and_avoids_flash():
+    markup = Path("src/free_claude_code/api/admin_static/index.html").read_text(
+        encoding="utf-8"
+    )
+    script = Path("src/free_claude_code/api/admin_static/admin.js").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'localStorage.getItem("fcc-admin-theme") === "dark"' in markup
+    assert 'document.documentElement.setAttribute("data-theme", "dark")' in markup
+    assert markup.index("fcc-admin-theme") < markup.index("<body>")
+    assert 'id="themeToggle"' in markup
+    assert 'aria-pressed="false"' in markup
+
+    assert "function initThemeToggle()" in script
+    assert 'document.documentElement.removeAttribute("data-theme")' in script
+    assert 'toggle.setAttribute("aria-pressed", String(isDark))' in script
+    assert 'localStorage.setItem("fcc-admin-theme", next)' in script
+    assert "initThemeToggle();" in script
+
+
 def test_admin_config_masks_secrets_and_exposes_manifest(monkeypatch, tmp_path):
     _set_home(monkeypatch, tmp_path)
     _clear_process_config(monkeypatch)

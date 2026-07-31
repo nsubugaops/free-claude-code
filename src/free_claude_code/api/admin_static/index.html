@@ -6,6 +6,17 @@
     <title>Free Claude Code Admin</title>
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="/admin/assets/admin.css" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem("fcc-admin-theme") === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+          }
+        } catch (error) {
+          /* localStorage unavailable; default to light theme */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div class="app-shell">
@@ -18,6 +29,10 @@
           </div>
         </div>
         <nav id="sectionNav" class="section-nav" aria-label="Admin views"></nav>
+        <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
+          <span id="themeToggleIcon" aria-hidden="true">🌙</span>
+          <span id="themeToggleLabel">Dark mode</span>
+        </button>
       </aside>
 
       <main class="main">
